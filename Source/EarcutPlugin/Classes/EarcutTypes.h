@@ -41,6 +41,7 @@ struct nth<0, FVector2D> {
         return t.X;
     };
 };
+
 template <>
 struct nth<1, FVector2D> {
     inline static auto get(const FVector2D &t) {
@@ -51,7 +52,7 @@ struct nth<1, FVector2D> {
 } // namespace util
 } // namespace mapbox
 
-struct FECVertexContainer
+struct EARCUTPLUGIN_API FECVertexContainer
 {
     typedef FVector2D          value_type;
     typedef TArray<value_type> container_type;
@@ -79,7 +80,7 @@ struct FECVertexContainer
     }
 };
 
-struct FECPolygon
+struct EARCUTPLUGIN_API FECPolygon
 {
     typedef FECVertexContainer value_type;
     typedef TArray<value_type> container_type;
@@ -109,37 +110,14 @@ struct FECPolygon
     }
 };
 
-class FECUtils
+class EARCUTPLUGIN_API FECUtils
 {
 public:
+
+    static void Earcut(const FECPolygon& Polygon, TArray<int32>& OutIndices, bool bInversed = false);
 
     FORCEINLINE static void Earcut(const TArray<FVector2D>& Points, TArray<int32>& OutIndices, bool bInversed = false)
     {
         Earcut(FECPolygon({ { Points } }), OutIndices, bInversed);
-    }
-
-    static void Earcut(const FECPolygon& Polygon, TArray<int32>& OutIndices, bool bInversed = false)
-    {
-        std::vector<int32> ECIndices( mapbox::earcut<int32>(Polygon) );
-        const int32 IndexCount = ECIndices.size();
-        const int32 TriCount = IndexCount / 3;
-
-        // Copy result
-        OutIndices.SetNumUninitialized(IndexCount);
-
-        if (bInversed)
-        {
-            FMemory::Memcpy(OutIndices.GetData(), ECIndices.data(), ECIndices.size() * sizeof(int32));
-        }
-        else
-        {
-            for (int32 ti=0; ti<TriCount; ++ti)
-            {
-                const int32 i = ti*3;
-                OutIndices[i  ] = ECIndices[i+2];
-                OutIndices[i+1] = ECIndices[i+1];
-                OutIndices[i+2] = ECIndices[i  ];
-            }
-        }
     }
 };
