@@ -34,6 +34,7 @@ void FECUtils::Earcut(const FECPolygon& Polygon, TArray<int32>& OutIndices, bool
     const int32 TriCount = IndexCount / 3;
 
     // Copy result
+
     OutIndices.SetNumUninitialized(IndexCount);
 
     if (bInversed)

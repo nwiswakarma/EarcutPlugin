@@ -31,6 +31,18 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "EarcutBlueprintUtility.generated.h"
 
+USTRUCT(BlueprintType)
+struct FEarcutPolyIndexPair
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 IndexStart;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 IndexEnd;
+};
+
 UCLASS()
 class EARCUTPLUGIN_API UEarcutBlueprintUtility : public UBlueprintFunctionLibrary
 {
@@ -43,4 +55,10 @@ public:
 
     UFUNCTION(BlueprintCallable, Category="Earcut")
     static void EarcutWithHole(TArray<int32>& OutIndices, const TArray<FVector2D>& InPoints, const TArray<FVector2D>& InHolePoints, bool bInversed = false);
+
+    UFUNCTION(BlueprintCallable, Category="Earcut")
+    static void EarcutPolygons(TArray<int32>& OutIndices, const TArray<FVector2D>& InPoints, const TArray<FEarcutPolyIndexPair>& InPolyIndexRanges, bool bInversed = false);
+
+    UFUNCTION(BlueprintCallable, Category="Earcut")
+    static void EarcutPolygonsByIndexOffset(TArray<int32>& OutIndices, const TArray<FVector2D>& InPoints, const TArray<int32>& InPolyIndexOffsets, bool bInversed = false);
 };

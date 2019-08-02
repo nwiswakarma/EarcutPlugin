@@ -52,37 +52,39 @@ struct nth<1, FVector2D> {
 } // namespace util
 } // namespace mapbox
 
-struct EARCUTPLUGIN_API FECVertexContainer
+struct EARCUTPLUGIN_API FECPointContainer
 {
     typedef FVector2D          value_type;
     typedef TArray<value_type> container_type;
 
-    const container_type& Vertices;
+    container_type Data;
 
-    FECVertexContainer(const container_type& InVertices)
-        : Vertices(InVertices)
+    FECPointContainer() = default;
+
+    FECPointContainer(const container_type& InPoints)
+        : Data(InPoints)
     {
     }
 
     SIZE_T size() const
     {
-        return Vertices.Num();
+        return Data.Num();
     }
 
     bool empty() const
     {
-        return Vertices.Num() == 0;
+        return Data.Num() == 0;
     }
 
     const FVector2D& operator[](SIZE_T Index) const
     {
-        return Vertices[Index];
+        return Data[Index];
     }
 };
 
 struct EARCUTPLUGIN_API FECPolygon
 {
-    typedef FECVertexContainer value_type;
+    typedef FECPointContainer value_type;
     typedef TArray<value_type> container_type;
 
     container_type Data;
@@ -104,7 +106,12 @@ struct EARCUTPLUGIN_API FECPolygon
         return Data.Num() == 0;
     }
 
-    const FECVertexContainer& operator[](SIZE_T i) const
+    FECPointContainer& operator[](SIZE_T i)
+    {
+        return Data[i];
+    }
+
+    const FECPointContainer& operator[](SIZE_T i) const
     {
         return Data[i];
     }

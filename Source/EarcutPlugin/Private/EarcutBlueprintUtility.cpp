@@ -37,3 +37,97 @@ void UEarcutBlueprintUtility::EarcutWithHole(TArray<int32>& OutIndices, const TA
 {
     FECUtils::Earcut(FECPolygon({ { InPoints }, { InHolePoints } }), OutIndices, bInversed);
 }
+
+void UEarcutBlueprintUtility::EarcutPolygons(TArray<int32>& OutIndices, const TArray<FVector2D>& InPoints, const TArray<FEarcutPolyIndexPair>& InPolyIndexRanges, bool bInversed)
+{
+    const int32 PointCount = InPoints.Num();
+    const int32 PolyCount = InPolyIndexRanges.Num();
+
+    if (InPoints.Num() < 3 || PolyCount < 1)
+    {
+        return;
+    }
+
+    FECPolygon Polygon;
+    Polygon.Data.SetNum(PolyCount);
+    
+    const int32 PointLastIndex = PointCount-1;
+
+    for (int32 gi=0; gi<PolyCount; ++gi)
+    {
+        const FEarcutPolyIndexPair& IndexPair(InPolyIndexRanges[gi]);
+
+        int32 IndexStart = IndexPair.IndexStart;
+        int32 IndexEnd = IndexPair.IndexEnd;
+        IndexStart = FMath::Clamp(IndexStart, 0, PointLastIndex);
+        IndexEnd = FMath::Clamp(IndexEnd, IndexStart, PointLastIndex);
+
+        int32 IndexCount = (IndexEnd-IndexStart) + 1;
+
+        if (IndexCount < 3)
+        {
+            continue;
+        }
+
+        FECPointContainer& PointContainer(Polygon.Data[gi]);
+        PointContainer.Data.SetNumUninitialized(IndexCount);
+
+        const FVector2D* SrcPointData = InPoints.GetData();
+        FVector2D* DstPointData = PointContainer.Data.GetData();
+
+        FMemory::Memcpy(DstPointData, SrcPointData+IndexStart, IndexCount*InPoints.GetTypeSize());
+    }
+
+    FECUtils::Earcut(Polygon, OutIndices, bInversed);
+}
+
+void UEarcutBlueprintUtility::EarcutPolygonsByIndexOffset(TArray<int32>& OutIndices, const TArray<FVector2D>& InPoints, const TArray<int32>& InPolyIndexOffsets, bool bInversed)
+{
+    const int32 PointCount = InPoints.Num();
+    const int32 PolyOffsetCount = InPolyIndexOffsets.Num();
+    const int32 PolyCount = PolyOffsetCount+1;
+    const int32 PointLastIndex = PointCount-1;
+
+    if (PointCount < 3)
+    {
+        return;
+    }
+
+    TArray<FEarcutPolyIndexPair> IndexRanges;
+
+    // Earcut with offset ranges
+    if (PolyOffsetCount > 0)
+    {
+        int32 IndexStart = 0;
+        int32 IndexEnd = 0;
+
+        // Add poly by offset ranges
+        for (int32 i=0; i<PolyOffsetCount; ++i)
+        {
+            const int32 IndexOffset = InPolyIndexOffsets[i];
+
+            IndexEnd = IndexOffset-1;
+
+            if (IndexEnd > IndexStart)
+            {
+                FEarcutPolyIndexPair IndexPair = { IndexStart, IndexEnd };
+                IndexRanges.Emplace(IndexPair);
+
+                IndexStart = IndexOffset;
+            }
+        }
+        // Add last remaining points as the last poly
+        if ((IndexEnd+1) < PointLastIndex)
+        {
+            FEarcutPolyIndexPair IndexPair = { IndexEnd+1, PointLastIndex };
+            IndexRanges.Emplace(IndexPair);
+        }
+
+        EarcutPolygons(OutIndices, InPoints, IndexRanges, bInversed);
+    }
+    // No offset specified, simple earcut with single poly
+    else
+    {
+        Earcut(OutIndices, InPoints, bInversed);
+    }
+}
