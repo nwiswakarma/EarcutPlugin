@@ -26,10 +26,34 @@
 // 
 
 #include "EarcutTypes.h"
+#include "mapbox/earcut.hpp"
+
+namespace mapbox {
+namespace util {
+
+template <>
+struct nth<0, FVector2D> {
+    inline static auto get(const FVector2D &t) {
+        return t.X;
+    };
+};
+
+template <>
+struct nth<1, FVector2D> {
+    inline static auto get(const FVector2D &t) {
+        return t.Y;
+    };
+};
+
+} // namespace util
+} // namespace mapbox
 
 void FECUtils::Earcut(const FECPolygon& Polygon, TArray<int32>& OutIndices, bool bInversed)
 {
-    std::vector<int32> ECIndices( mapbox::earcut<int32>(Polygon) );
+    mapbox::detail::Earcut<int32> ECImpl;
+    ECImpl(Polygon);
+
+    const std::vector<int32>& ECIndices(ECImpl.indices);
     const int32 IndexCount = ECIndices.size();
     const int32 TriCount = IndexCount / 3;
 

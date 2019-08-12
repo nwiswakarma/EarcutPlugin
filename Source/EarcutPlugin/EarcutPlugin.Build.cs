@@ -53,6 +53,6 @@ public class EarcutPlugin: ModuleRules
         string EarcutPath = Path.Combine(ThirdPartyPath, "earcut.hpp/earcut.hpp-0.12.3");
         string EarcutInclude = Path.Combine(EarcutPath, "include");
 
-        PublicIncludePaths.Add(Path.GetFullPath(EarcutInclude));
+        PrivateIncludePaths.Add(Path.GetFullPath(EarcutInclude));
     }
 }

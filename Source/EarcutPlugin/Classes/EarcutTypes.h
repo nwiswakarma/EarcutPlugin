@@ -27,30 +27,8 @@
 
 #pragma once
 
-#include "CoreTypes.h"
-#include "UnrealMemory.h"
-#include "mapbox/earcut.hpp"
+#include "CoreMinimal.h"
 #include <vector>
-
-namespace mapbox {
-namespace util {
-
-template <>
-struct nth<0, FVector2D> {
-    inline static auto get(const FVector2D &t) {
-        return t.X;
-    };
-};
-
-template <>
-struct nth<1, FVector2D> {
-    inline static auto get(const FVector2D &t) {
-        return t.Y;
-    };
-};
-
-} // namespace util
-} // namespace mapbox
 
 struct EARCUTPLUGIN_API FECPointContainer
 {
