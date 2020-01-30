@@ -29,6 +29,8 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "GULTypes.h"
+#include "Poly/GULPolyTypes.h"
 #include "EarcutBlueprintUtility.generated.h"
 
 USTRUCT(BlueprintType)
@@ -61,4 +63,7 @@ public:
 
     UFUNCTION(BlueprintCallable, Category="Earcut")
     static void EarcutPolygonsByIndexOffset(TArray<int32>& OutIndices, const TArray<FVector2D>& InPoints, const TArray<int32>& InPolyIndexOffsets, bool bInversed = false);
+
+    UFUNCTION(BlueprintCallable, Category="Earcut")
+    static void EarcutIndexedPolyGroups(TArray<FGULIntGroup>& OutPolyIndices, const TArray<FGULIndexedPolyGroup>& InIndexGroups, const TArray<FGULVector2DGroup>& InPolyGroups, bool bInversed = false);
 };

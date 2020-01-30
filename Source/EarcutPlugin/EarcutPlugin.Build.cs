@@ -39,7 +39,8 @@ public class EarcutPlugin: ModuleRules
             new string[] {
                 "Core",
                 "CoreUObject",
-                "Engine"
+                "Engine",
+                "GeometryUtilityLibrary"
             });
 
         PrivateDependencyModuleNames.AddRange(

@@ -131,3 +131,33 @@ void UEarcutBlueprintUtility::EarcutPolygonsByIndexOffset(TArray<int32>& OutIndi
         Earcut(OutIndices, InPoints, bInversed);
     }
 }
+
+void UEarcutBlueprintUtility::EarcutIndexedPolyGroups(TArray<FGULIntGroup>& OutPolyIndices, const TArray<FGULIndexedPolyGroup>& InIndexGroups, const TArray<FGULVector2DGroup>& InPolyGroups, bool bInversed)
+{
+    // Set number of output poly indices equal to input index group,
+    // invalid index group would have empty indices
+    OutPolyIndices.SetNum(InIndexGroups.Num());
+
+    for (int32 i=0; i<InIndexGroups.Num(); ++i)
+    {
+        const FGULIndexedPolyGroup& IndexGroup(InIndexGroups[i]);
+
+        // Skip invalid index group
+        if (! IndexGroup.IsValidIndexGroup(InPolyGroups))
+        {
+            continue;
+        }
+
+        int32 OuterPolyIndex = IndexGroup.OuterPolyIndex;
+        const TArray<int32>& InnerPolyIndices(IndexGroup.InnerPolyIndices);
+
+        FECPolygon Polygon({ { InPolyGroups[OuterPolyIndex].Points } });
+
+        for (int32 pi : InnerPolyIndices)
+        {
+            Polygon.Data.Emplace(InPolyGroups[pi].Points);
+        }
+
+        FECUtils::Earcut(Polygon, OutPolyIndices[i].Values, bInversed);
+    }
+}
